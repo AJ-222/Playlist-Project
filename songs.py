@@ -1,6 +1,6 @@
 import sys
 import os
-from myGetters import print_track_info,get_all_h5_paths
+from myUtils.myGetters import print_track_info,get_all_h5_paths
 # Dynamically add PythonSrc to sys.path
 base_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(base_dir, "PythonSrc"))
