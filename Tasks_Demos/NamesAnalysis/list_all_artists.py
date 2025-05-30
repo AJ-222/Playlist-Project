@@ -43,7 +43,7 @@ def get_artistid_trackid_artistname(trackfile):
     It is returns as a triple (,,)
     Assumes one song per file only!
     """
-    h5 = hdf5_utils.open_h5_file_read(trackfile)
+    h5 = PythonSrc.hdf5_utils.open_h5_file_read(trackfile)
     assert GETTERS.get_num_songs(h5) == 1,'code must be modified if more than one song per .h5 file'
     aid = GETTERS.get_artist_id(h5)
     ambid = GETTERS.get_artist_mbid(h5)
@@ -118,8 +118,8 @@ if __name__ == '__main__':
     pythonsrc = os.path.join(sys.argv[0],'../../../PythonSrc')
     pythonsrc = os.path.abspath( pythonsrc )
     sys.path.append( pythonsrc )
-    import hdf5_utils
-    import hdf5_getters as GETTERS
+    import PythonSrc.hdf5_utils as hdf5_utils
+    import PythonSrc.hdf5_getters as GETTERS
 
     # params
     maindir = sys.argv[1]

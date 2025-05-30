@@ -35,7 +35,7 @@ import datetime
 import multiprocessing
 import numpy as np
 from operator import itemgetter
-import hdf5_getters as GETTERS
+import PythonSrc.hdf5_getters as GETTERS
 import process_train_set as TRAIN # for the features
 try:
     import scikits.ann as ANN

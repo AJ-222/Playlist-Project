@@ -43,8 +43,8 @@ pythonsrc = os.path.abspath('__file__')
 pythonsrc = os.path.join(pythonsrc,'../../../PythonSrc')
 pythonsrc = os.path.abspath( pythonsrc )
 sys.path.append( pythonsrc )
-import hdf5_utils
-import hdf5_getters as GETTERS
+import PythonSrc.hdf5_utils as hdf5_utils
+import PythonSrc.hdf5_getters as GETTERS
 
 # try to get 7digital API key
 global DIGITAL7_API_KEY

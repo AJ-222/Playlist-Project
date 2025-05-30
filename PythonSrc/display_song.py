@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import sys
-import hdf5_getters
+import PythonSrc.hdf5_getters as hdf5_getters
 import numpy as np
 
 

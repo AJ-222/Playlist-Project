@@ -40,7 +40,7 @@ try:
 except ImportError:
     print "You can't use multiprocessing"
 # our HDF utils library
-import hdf5_utils as HDF5
+import PythonSrc.hdf5_utils as HDF5
 # Echo Nest python API
 from pyechonest import artist as artistEN
 from pyechonest import song as songEN

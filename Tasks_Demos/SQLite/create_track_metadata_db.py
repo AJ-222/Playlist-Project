@@ -238,7 +238,7 @@ if __name__ == '__main__':
     pythonsrc = os.path.join(sys.argv[0], '../../../PythonSrc')
     pythonsrc = os.path.abspath(pythonsrc)
     sys.path.append(pythonsrc)
-    from hdf5_getters import *
+    from PythonSrc.hdf5_getters import *
 
     verbose = 0
     shsdataset = ''

@@ -35,7 +35,7 @@ import glob
 import sqlite3
 import datetime
 import numpy as np
-import hdf5_getters as GETTERS
+import PythonSrc.hdf5_getters as GETTERS
 
 
 def convert_year(y):

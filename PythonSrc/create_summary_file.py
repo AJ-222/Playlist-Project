@@ -31,8 +31,8 @@ import sys
 import glob
 import time
 import datetime
-import hdf5_utils as HDF5
-import utils
+import PythonSrc.hdf5_utils as HDF5
+import PythonSrc.utils as utils
 
 
 def die_with_usage():

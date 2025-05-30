@@ -37,7 +37,7 @@ import urllib2
 import multiprocessing
 import numpy.random as npr
 try:
-    import hdf5_utils as HDF5
+    import PythonSrc.hdf5_utils as HDF5
 except ImportError:
     pass # will be imported in command line
 
@@ -1128,7 +1128,7 @@ if __name__ == '__main__':
 
     # local imports
     sys.path.append(os.path.abspath(os.path.join(sys.argv[0],'../..')))
-    import hdf5_utils as HDF5
+    import PythonSrc.hdf5_utils as HDF5
 
     # flags
     nthreads = 1

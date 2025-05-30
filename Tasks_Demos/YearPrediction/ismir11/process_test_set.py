@@ -38,7 +38,7 @@ import sqlite3
 import datetime
 import multiprocessing
 import numpy as np
-import hdf5_getters as GETTERS
+import PythonSrc.hdf5_getters as GETTERS
 import compress_feat as CBTF
 import year_pred_benchmark as BENCHMARK
 import randproj as RANDPROJ

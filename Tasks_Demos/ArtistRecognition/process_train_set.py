@@ -34,7 +34,7 @@ import sqlite3
 import datetime
 import multiprocessing
 import numpy as np
-import hdf5_getters as GETTERS
+import PythonSrc.hdf5_getters as GETTERS
 
 
 # error passing problems, useful for multiprocessing

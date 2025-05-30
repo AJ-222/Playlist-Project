@@ -91,8 +91,8 @@ if __name__ == '__main__':
     pythonsrc = os.path.join(sys.argv[0],'../../../PythonSrc')
     pythonsrc = os.path.abspath( pythonsrc )
     sys.path.append( pythonsrc )
-    import hdf5_utils
-    from hdf5_getters import *
+    import PythonSrc.hdf5_utils as hdf5_utils
+    from PythonSrc.hdf5_getters import *
 
     # read params
     maindir = os.path.abspath(sys.argv[1])

@@ -1,4 +1,17 @@
+import sys
+import os
+from myGetters import print_track_info,get_all_h5_paths
+# Dynamically add PythonSrc to sys.path
+base_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(base_dir, "PythonSrc"))
 import hdf5_getters
-h5 = hdf5_getters.open_h5_file_read("millionsongsubset\MillionSongSubset\A\A\A\TRAAAAW128F429D538.h5")
-duration = hdf5_getters.get_duration(h5)
-h5.close()
+
+
+root = "millionsongsubset/MillionSongSubset"  # Adjust this if your path differs
+all_h5_files = get_all_h5_paths(root)
+
+print(f"Found {len(all_h5_files)} HDF5 files.")
+for path in all_h5_files[:5]:  # Preview first 5
+    print(path)
+
+song_data = []

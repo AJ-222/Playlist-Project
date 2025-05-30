@@ -193,8 +193,8 @@ def debug_from_song_file(connect,h5path,verbose=0):
     Only prints when we dont get exact match!
     RETURN counts of how many files we filled for years, tags
     """
-    import hdf5_utils as HDF5
-    import hdf5_getters as GETTERS
+    import PythonSrc.hdf5_utils as HDF5
+    import PythonSrc.hdf5_getters as GETTERS
     h5 = HDF5.open_h5_file_read(h5path)
     title = GETTERS.get_title(h5)
     release = GETTERS.get_release(h5)
