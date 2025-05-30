@@ -1,1 +1,3 @@
-.env
+#ignore songs
+# Ignore all files in the songs directory
+/millionsongsubset/*
