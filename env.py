@@ -64,4 +64,12 @@ class MusicEnv(gym.Env):
         return 1 - abs(song["Energy"] - target_energy)
     
     def simulateUser(self, song):
-        pass
+            target_mood = np.linspace(self.startMood, self.endMood, self.length)[self.currentPos]
+
+            mood_diff = abs(song["Mood"] - target_mood)
+            if mood_diff < 0.1:
+                return 1  # strong positive feedback
+            elif mood_diff < 0.2:
+                return 0.5  # neutral/mild positive
+            else:
+                return 0  # negative feedback

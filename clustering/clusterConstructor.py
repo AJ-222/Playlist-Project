@@ -38,6 +38,7 @@ centers_original = scaler.inverse_transform(kmeans.cluster_centers_)
 centers_df = pd.DataFrame(centers_original, columns=CLUSTER_FEATURES)
 centers_df["Cluster"] = range(8)
 centers_df["GenreLabel"] = centers_df["Cluster"].map(genre_labels)
+
 df.to_csv("clustered_songs_with_genres.csv", index=False)
 
 # Write the cluster center feature values with genre labels
