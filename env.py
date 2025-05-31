@@ -59,10 +59,11 @@ class MusicEnv(gym.Env):
             ])
 
         
-    def calculateReward(self, song): #proxy reward function
-        target_energy = np.linspace(self.startMood, self.endMood, self.length)[self.currentPos]
-        return 1 - abs(song["Energy"] - target_energy)
-    
+    def calculateReward(self, song):
+        reward, feedback = self.simulateUser(song)
+        print(f"[Feedback] {song['Title']} by {song['Artist']} → {feedback}")
+        return reward
+
     def simulateUser(self, song):
         target_mood = np.linspace(self.startMood, self.endMood, self.length)[self.currentPos]
         mood_diff = abs(song["Mood"] - target_mood)
@@ -92,3 +93,8 @@ class MusicEnv(gym.Env):
             if emotion_roll < 0.3:
                 return 0.1, "Neutral after full listen +0.1"
             return 0.0, "No clear reaction 0"
+
+    def render(self):
+        print("\nFinal Playlist:")
+        for i, song in enumerate(self.playlist):
+            print(f"{i+1}. {song['Title']} by {song['Artist']} (Mood: {song['Mood']:.2f}, Cluster: {song['Cluster']})")
