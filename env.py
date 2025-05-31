@@ -12,36 +12,27 @@ class MusicEnv(gym.Env):
         self.user = user
         self.length = length
 
-        self.observation_space = Box(low=0, high=1, shape=(5), dtype=np.float32)
+        self.observation_space = Box(low=0, high=1, shape=(3,), dtype=np.float32)
         self.action_space = Discrete(3)
         self.reset()
     def reset(self):
         self.playlist = []
         self.currentPos = 0
-        self.songEnergy = []
-        self.songDanceability = []
-
         self.startMood = self.user.get("startMood",0.2)
         self.endMood = self.user.get("endMood",0.8)
         return self.getState()
     
     def getState(self):
-        avgEnergy = np.mean(self.songEnergy) if self.songEnergy else 0
-        avgDanceability = np.mean(self.songDanceability) if self.songDanceability else 0
         progress = self.currentPos / self.length
         return np.array([
             self.startMood,
             self.endMood,
             progress,
-            avgEnergy,
-            avgDanceability
         ], dtype=np.float32)	
 
     def step(self, action):
         song = self.selectSong(action)
         self.playlist.append(song)
-        self.songEnergy.append(song["Energy"])
-        self.songDanceability.append(song["Danceability"])
         
         reward = self.calculateReward(song)
         self.currentPos += 1
