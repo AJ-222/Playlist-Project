@@ -6,17 +6,33 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 import seaborn as sns
 
+CLUSTER_FEATURES = [
+    "Tempo", "Loudness", "Duration", "Key", "Mode",
+    "Year", "Hotttnesss", "AvgTimbre", "AvgPitches"
+]
+
+def parseSongsfromCSV(path="track_raw_features.csv"):
+    songs = pd.read_csv(path)
+    for col in CLUSTER_FEATURES:
+        songs[col] = pd.to_numeric(songs[col], errors="coerce")
+    songs[CLUSTER_FEATURES] = songs[CLUSTER_FEATURES].fillna(songs[CLUSTER_FEATURES].mean())
+    return songs
+
+def kMeans(songs, n_clusters=10):
+    scaled = StandardScaler().fit_transform(songs[CLUSTER_FEATURES])
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    songs["Cluster"] = kmeans.fit_predict(scaled)
+    return songs, kmeans
+
 def plot_elbow_curve(songs, max_k=15):
-    features = songs[["AvgTimbre", "AvgPitches"]].fillna(0)
-    scaled = StandardScaler().fit_transform(features)
-    
+    scaled = StandardScaler().fit_transform(songs[CLUSTER_FEATURES])
     inertias = []
     k_range = range(2, max_k + 1)
     for k in k_range:
         kmeans = KMeans(n_clusters=k, random_state=42)
         kmeans.fit(scaled)
         inertias.append(kmeans.inertia_)
-    
+
     plt.figure(figsize=(8, 5))
     plt.plot(k_range, inertias, marker='o')
     plt.xlabel("Number of Clusters (k)")
@@ -25,11 +41,8 @@ def plot_elbow_curve(songs, max_k=15):
     plt.grid(True)
     plt.show()
 
-
 def plot_pca_clusters(songs, title="🎼 PCA Visualization of Clusters"):
-    features = songs[["AvgTimbre", "AvgPitches"]].fillna(0)
-    scaled = StandardScaler().fit_transform(features)
-
+    scaled = StandardScaler().fit_transform(songs[CLUSTER_FEATURES])
     pca = PCA(n_components=2)
     pca_result = pca.fit_transform(scaled)
 
@@ -46,32 +59,17 @@ def plot_pca_clusters(songs, title="🎼 PCA Visualization of Clusters"):
     plt.tight_layout()
     plt.show()
 
-
-
-
-
-def kMeans(songs, n_clusters=10):
-    features = songs[["AvgTimbre", "AvgPitches"]].fillna(0)
-
-    scaled = StandardScaler().fit_transform(features)
-    
-    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-    songs["Cluster"] = kmeans.fit_predict(scaled)
-    
-    return songs, kmeans
-
-def parseSongsfromCSV(path="track_raw_features.csv"):
-    return pd.read_csv(path)
-
 def preview_clusters(songs, n_samples=5):
     grouped = songs.groupby("Cluster")
     for cluster_id, group in grouped:
         print(f"\nCluster {cluster_id} — {len(group)} songs")
         sample = group.sample(min(n_samples, len(group)), random_state=42)
         for _, row in sample.iterrows():
-            print(f"{row['Title']} by {row['Artist']} (Energy: {row['Energy']:.2f}, Danceability: {row['Danceability']:.2f})")
+            print(f"{row['Title']} by {row['Artist']} (Hotttnesss: {row['Hotttnesss']:.2f})")
 
-songs, _ = kMeans(parseSongsfromCSV())
+# Run the process
+songs = parseSongsfromCSV()
+songs, _ = kMeans(songs, n_clusters=8)
 preview_clusters(songs)
-plot_elbow_curve(songs) 
+plot_elbow_curve(songs)
 plot_pca_clusters(songs, "🎶 PCA Visualization of Music Clusters")
