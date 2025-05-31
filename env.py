@@ -7,19 +7,17 @@ import random
 class MusicEnv(gym.Env):
     def __init__(self, songs, user, length=10):
         super(MusicEnv, self).__init__()
-
         self.songs = songs
         self.user = user
         self.length = length
-
         self.observation_space = Box(low=0, high=1, shape=(3,), dtype=np.float32)
         self.action_space = Discrete(3)
         self.reset()
     def reset(self):
         self.playlist = []
         self.currentPos = 0
-        self.startMood = self.user.get("startMood",0.2)
-        self.endMood = self.user.get("endMood",0.8)
+        self.startMood = self.user.startMood
+        self.endMood = self.user.endMood
         return self.getState()
     
     def getState(self):
@@ -44,13 +42,15 @@ class MusicEnv(gym.Env):
             return random.choice([
                 s for s in self.songs
                 if abs(s["Mood"] - self.startMood) < 0.1
-                and s["Cluster"] == self.user["preferredCluster"]
+                and s["Cluster"] == self.user.preferredCluster
+
             ])
         elif action == 1: #risky action
             return random.choice([
                 s for s in self.songs
                 if abs(s["Mood"] - self.startMood) < 0.1
-                and s["Cluster"] != self.user["preferredCluster"]
+                and s["Cluster"] != self.user.preferredCluster
+
             ])
         else:   #popular action
             return random.choice([
@@ -68,7 +68,8 @@ class MusicEnv(gym.Env):
         target_mood = np.linspace(self.startMood, self.endMood, self.length)[self.currentPos]
         mood_diff = abs(song["Mood"] - target_mood)
 
-        cluster_match = (song["Cluster"] == self.user["preferredCluster"])
+        cluster_match = (song["Cluster"] == self.user.preferredCluster
+)
 
         if mood_diff > 0.5 or (not cluster_match and random.random() < 0.5):
             skipped = random.random() < 0.8 #probably gonna skip
