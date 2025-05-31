@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
-
 class RandomAgent:
     def __init__(self, songs, user, length=10):
         self.songs = songs
         self.user = user
+        self.name = "RandomAgent"
         self.length = length
         self.playlist = []
         self.currentPos = 0
@@ -14,13 +14,23 @@ class RandomAgent:
         self.currentPos = 0
         self.startMood = self.user.startMood
         self.endMood = self.user.endMood
+        self.startMoodVec = self.user.startMoodVec
+        self.endMoodVec = self.user.endMoodVec
         return self.getState()
 
+        
     def getState(self):
         progress = self.currentPos / self.length
-        return np.array([self.startMood, self.endMood, progress], dtype=np.float32)
+        return np.array([
+            *self.user.startMoodVec,
+            *self.user.endMoodVec,
+            progress
+        ], dtype=np.float32)
 
-    def act(self):
+
+
+
+    def act(self,state):
         return np.random.choice([0, 1, 2])
 
     def step(self, env):

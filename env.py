@@ -10,23 +10,22 @@ class MusicEnv(gym.Env):
         self.songs = songs
         self.user = user
         self.length = length
-        self.observation_space = Box(low=0, high=1, shape=(3,), dtype=np.float32)
+        self.observation_space = Box(low=0, high=1, shape=(7,), dtype=np.float32)
         self.action_space = Discrete(3)
         self.reset()
+
     def reset(self):
         self.playlist = []
         self.currentPos = 0
-        self.startMood = self.user.startMood
-        self.endMood = self.user.endMood
         return self.getState()
     
     def getState(self):
         progress = self.currentPos / self.length
-        return np.array([
-            self.startMood,
-            self.endMood,
-            progress,
-        ], dtype=np.float32)	
+        return np.concatenate([
+            self.user.startMoodVec,
+            self.user.endMoodVec,
+            [progress]
+        ]).astype(np.float32)
 
     def step(self, action):
         song = self.selectSong(action)
@@ -37,53 +36,51 @@ class MusicEnv(gym.Env):
         done = self.currentPos >= self.length
         return self.getState(), reward, done, {}
 
-    def selectSong(self, action): #proxy action selection function
-        if action == 0: #safe action
-            return random.choice([
-                s for s in self.songs
-                if abs(s["Mood"] - self.startMood) < 0.1
-                and s["Cluster"] == self.user.preferredCluster
+    def selectSong(self, action):
+        valence_target = self.user.startMoodVec[0]  # use valence for filtering
 
-            ])
-        elif action == 1: #risky action
-            return random.choice([
-                s for s in self.songs
-                if abs(s["Mood"] - self.startMood) < 0.1
-                and s["Cluster"] != self.user.preferredCluster
+        if action == 0:  # safe
+            candidates = [
+                row for _, row in self.songs.iterrows()
+                if abs(row["MoodValence"] - valence_target) < 0.1 and row["Cluster"] == self.user.preferredCluster
+            ]
+        elif action == 1:  # risky
+            candidates = [
+                row for _, row in self.songs.iterrows()
+                if abs(row["MoodValence"] - valence_target) < 0.1 and row["Cluster"] != self.user.preferredCluster
+            ]
+        else:  # popular
+            candidates = [
+                row for _, row in self.songs.iterrows()
+                if row["Hotttnesss"] > 0.7 and abs(row["MoodValence"] - valence_target) < 0.2
+            ]
 
-            ])
-        else:   #popular action
-            return random.choice([
-                s for s in self.songs
-                if s["Hotttnesss"] > 0.7 and abs(s["Mood"] - self.startMood) < 0.2
-            ])
+        return random.choice(candidates) if candidates else self.songs.sample(1).iloc[0]
 
-        
     def calculateReward(self, song):
         reward, feedback = self.simulateUser(song)
         print(f"[Feedback] {song['Title']} by {song['Artist']} → {feedback}")
         return reward
 
     def simulateUser(self, song):
-        target_mood = np.linspace(self.startMood, self.endMood, self.length)[self.currentPos]
-        mood_diff = abs(song["Mood"] - target_mood)
+        # use linear interpolation in valence space only for simplicity
+        mood_gradient = np.linspace(self.user.startMoodVec[0], self.user.endMoodVec[0], self.length)
+        target_valence = mood_gradient[self.currentPos]
+        mood_diff = abs(song["MoodValence"] - target_valence)
 
-        cluster_match = (song["Cluster"] == self.user.preferredCluster
-)
+        cluster_match = song["Cluster"] == self.user.preferredCluster
 
         if mood_diff > 0.5 or (not cluster_match and random.random() < 0.5):
-            skipped = random.random() < 0.8 #probably gonna skip
+            skipped = random.random() < 0.8
         else:
             skipped = random.random() < 0.2
 
         if skipped:
-            #skipped
             if random.random() < 0.5:
                 return -1.0, "Skipped before halfway -1"
             else:
                 return -0.5, "Skipped after halfway -0.5"
         else:
-            #listened
             emotion_roll = random.random()
             if mood_diff < 0.2 and cluster_match:
                 if emotion_roll < 0.7:
@@ -98,4 +95,4 @@ class MusicEnv(gym.Env):
     def render(self):
         print("\nFinal Playlist:")
         for i, song in enumerate(self.playlist):
-            print(f"{i+1}. {song['Title']} by {song['Artist']} (Mood: {song['Mood']:.2f}, Cluster: {song['Cluster']})")
+            print(f"{i+1}. {song['Title']} by {song['Artist']} (MoodValence: {song['MoodValence']:.2f}, Cluster: {song['Cluster']})")
