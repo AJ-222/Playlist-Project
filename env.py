@@ -64,12 +64,31 @@ class MusicEnv(gym.Env):
         return 1 - abs(song["Energy"] - target_energy)
     
     def simulateUser(self, song):
-            target_mood = np.linspace(self.startMood, self.endMood, self.length)[self.currentPos]
+        target_mood = np.linspace(self.startMood, self.endMood, self.length)[self.currentPos]
+        mood_diff = abs(song["Mood"] - target_mood)
 
-            mood_diff = abs(song["Mood"] - target_mood)
-            if mood_diff < 0.1:
-                return 1  # strong positive feedback
-            elif mood_diff < 0.2:
-                return 0.5  # neutral/mild positive
+        cluster_match = (song["Cluster"] == self.user["preferredCluster"])
+
+        if mood_diff > 0.5 or (not cluster_match and random.random() < 0.5):
+            skipped = random.random() < 0.8 #probably gonna skip
+        else:
+            skipped = random.random() < 0.2
+
+        if skipped:
+            #skipped
+            if random.random() < 0.5:
+                return -1.0, "Skipped before halfway -1"
             else:
-                return 0  # negative feedback
+                return -0.5, "Skipped after halfway -0.5"
+        else:
+            #listened
+            emotion_roll = random.random()
+            if mood_diff < 0.2 and cluster_match:
+                if emotion_roll < 0.7:
+                    return 1.0, "Liked the song +1"
+            if mood_diff > 0.4:
+                if emotion_roll < 0.5:
+                    return -0.25, "Disliked the song -0.25"
+            if emotion_roll < 0.3:
+                return 0.1, "Neutral after full listen +0.1"
+            return 0.0, "No clear reaction 0"
