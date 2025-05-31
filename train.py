@@ -45,6 +45,7 @@ state = agent.reset()
 env.reset()
 
 print(f"\nUser: {user.name}...\n")
+print(f"Start Mood: {user.startMood} → End Mood: {user.endMood}")
 print(f"\Agent: {agent.name}...\n")
 total_reward = 0
 for t in range(env.length):
