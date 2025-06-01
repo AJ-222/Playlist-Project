@@ -1,5 +1,5 @@
 archetype,startMood,endMood,favouriteCluster
-Lonely Stoner,Sad,Happy,7
+Lonely Stoner,Sad,Relaxed,7
 Divorced Dad,Sad,Nostalgic,3
 Popular Girl,Bored,Happy,6
 Gym Bro Warmup,Relaxed,Energetic,2
@@ -11,4 +11,4 @@ DnB Raver,Angry,Energetic,2
 Jazz Junkie,Relaxed,Focused,1
 Indie Dreamer,Focused,Inspired,3
 Pop Princess,Happy,Inspired,6
-Party Starter,Happy,Energetic,2
+Party Starter,Happy,Energetic,2 

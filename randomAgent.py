@@ -27,11 +27,8 @@ class RandomAgent:
             progress
         ], dtype=np.float32)
 
-
-
-
     def act(self,state):
-        return np.random.choice([0, 1, 2])
+        return np.random.choice([0, 1, 2,3,4,5,6,7])  # Randomly select an action from the available clusters
 
     def step(self, env):
         state = self.getState()

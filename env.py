@@ -11,7 +11,7 @@ class MusicEnv(gym.Env):
         self.user = user
         self.length = length
         self.observation_space = Box(low=0, high=1, shape=(7,), dtype=np.float32)
-        self.action_space = Discrete(3)
+        self.action_space = Discrete(8)
         self.reset()
 
     def reset(self):
@@ -37,25 +37,16 @@ class MusicEnv(gym.Env):
         return self.getState(), reward, done, {}
 
     def selectSong(self, action):
-        valence_target = self.user.startMoodVec[0]  # use valence for filtering
+        valence_target = self.user.startMoodVec[0]
 
-        if action == 0:  # safe
-            candidates = [
-                row for _, row in self.songs.iterrows()
-                if abs(row["MoodValence"] - valence_target) < 0.1 and row["Cluster"] == self.user.preferredCluster
-            ]
-        elif action == 1:  # risky
-            candidates = [
-                row for _, row in self.songs.iterrows()
-                if abs(row["MoodValence"] - valence_target) < 0.1 and row["Cluster"] != self.user.preferredCluster
-            ]
-        else:  # popular
-            candidates = [
-                row for _, row in self.songs.iterrows()
-                if row["Hotttnesss"] > 0.7 and abs(row["MoodValence"] - valence_target) < 0.2
-            ]
+    # Select from the specific cluster corresponding to the action number
+        candidates = [
+            row for _, row in self.songs.iterrows()
+            if row["Cluster"] == action and abs(row["MoodValence"] - valence_target) < 0.2
+        ]
 
         return random.choice(candidates) if candidates else self.songs.sample(1).iloc[0]
+
 
     def calculateReward(self, song):
         reward, feedback = self.simulateUser(song)
