@@ -2,9 +2,8 @@ import pandas as pd
 from env import MusicEnv
 from randomAgent import RandomAgent
 from user import User
-from moodmapping import cluster_to_mood
 # Load songs
-songs = pd.read_csv("finalData.csv")
+songs = pd.read_csv("clustered_songs.csv")
 
 # Ensure required columns are numeric and clean
 required_columns = ["Tempo", "Loudness", "Duration", "Key", "Mode",
@@ -13,7 +12,17 @@ for col in required_columns:
     songs[col] = pd.to_numeric(songs[col], errors="coerce")
 songs = songs.dropna(subset=["Cluster"])  # Make sure Cluster exists
 
-# Assign mood info from cluster
+mood_df = pd.read_csv("cluster_to_mood.csv")
+
+
+cluster_to_mood = {
+    row["Cluster"]: {
+        "Valence": row["Valence"],
+        "Energy": row["Energy"],
+        "Depth": row["Depth"]
+    }
+    for _, row in mood_df.iterrows()
+}
 songs["MoodValence"] = songs["Cluster"].map(lambda c: cluster_to_mood.get(c, {}).get("Valence", 0.5))
 songs["MoodEnergy"] = songs["Cluster"].map(lambda c: cluster_to_mood.get(c, {}).get("Energy", 0.5))
 songs["MoodDepth"]   = songs["Cluster"].map(lambda c: cluster_to_mood.get(c, {}).get("Depth",  0.5))

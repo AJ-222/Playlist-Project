@@ -10,7 +10,9 @@ class MusicEnv(gym.Env):
         self.songs = songs
         self.user = user
         self.length = length
-        self.observation_space = Box(low=0, high=1, shape=(7,), dtype=np.float32)
+        #(startMood) + (endMood) + (progress) + (3 moods × 3 features)
+        self.observation_space = Box(low=0, high=1, shape=(16,), dtype=np.float32)
+
         self.action_space = Discrete(8)
         self.reset()
 
@@ -21,10 +23,12 @@ class MusicEnv(gym.Env):
     
     def getState(self):
         progress = self.currentPos / self.length
+        favs = self.getFavouriteMoodVecs()  # Shape: (9,)
         return np.concatenate([
-            self.user.startMoodVec,
-            self.user.endMoodVec,
-            [progress]
+            self.user.startMoodVec,    
+            self.user.endMoodVec,       
+            [progress],                 
+            favs                        
         ]).astype(np.float32)
 
     def step(self, action):
@@ -82,6 +86,24 @@ class MusicEnv(gym.Env):
             if emotion_roll < 0.3:
                 return 0.1, "Neutral after full listen +0.1"
             return 0.0, "No clear reaction 0"
+    def getFavouriteMoodVecs(self):
+        moods = []
+        for title in self.user.favourite_titles:  # List of 3 song titles
+            matching_song = self.songs[self.songs["Title"] == title]
+            if not matching_song.empty:
+                song = matching_song.iloc[0]
+                moods.append([
+                    song["MoodValence"],
+                    song["MoodEnergy"],
+                    song["MoodDepth"]
+                ])
+            else:
+                # If the song is not found, use a neutral fallback
+                moods.append([0.5, 0.5, 0.5])
+        return np.array(moods).flatten()
+
+
+
 
     def render(self):
         print("\nFinal Playlist:")
