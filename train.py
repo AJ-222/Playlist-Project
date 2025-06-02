@@ -42,7 +42,8 @@ user = User(
     startMood=user_row["startMood"],
     endMood=user_row["endMood"],
     preferredCluster=int(user_row["favouriteCluster"]),
-    mood_dict=mood_dict  # You need to make sure this is loaded above
+    mood_dict=mood_dict,  # You need to make sure this is loaded above
+    favourite_titles=user_row["FavouriteSongs"].split(";") if pd.notna(user_row["FavouriteSongs"]) else []
 )
 
 # Init environment

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 class User:
-    def __init__(self, name, startMood, endMood, preferredCluster, mood_dict, favourite_titles=None):
+    def __init__(self, name, startMood, endMood, preferredCluster, mood_dict, favourite_titles):
         self.name = name
         self.startMood = startMood
         self.endMood = endMood
@@ -10,7 +10,6 @@ class User:
 
         self.startMoodVec = np.array(mood_dict[startMood])
         self.endMoodVec = np.array(mood_dict[endMood])
-
         # List of 3 favourite song titles
         self.favourite_titles = favourite_titles if favourite_titles is not None else []
 
