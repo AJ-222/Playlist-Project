@@ -4,7 +4,7 @@ import random
 
 
 class QLearningAgent:
-    def __init__(self, n_actions=8, state_size=16, alpha=0.1, gamma=0.9, epsilon=0.1):
+    def __init__(self, n_actions=8, state_size=16, alpha=0.3, gamma=0.9, epsilon=0.5):
         self.n_actions = n_actions
         self.state_size = state_size
         self.alpha = alpha  # learning rate
@@ -13,7 +13,7 @@ class QLearningAgent:
         self.q_table = {}
 
     def get_state_key(self, state):
-        return tuple(np.round(state, 2))  # Discretize state
+        return tuple(np.round(state, 1))  # Discretize state
 
     def act(self, state):
         state_key = self.get_state_key(state)

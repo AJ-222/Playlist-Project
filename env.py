@@ -100,34 +100,36 @@ class MusicEnv(gym.Env):
         return reward
 
     def simulateUser(self, song):
-        # use linear interpolation in valence space only for simplicity
         mood_gradient = np.linspace(self.user.startMoodVec[0], self.user.endMoodVec[0], self.length)
         target_valence = mood_gradient[self.currentPos]
         mood_diff = abs(song["MoodValence"] - target_valence)
-
         cluster_match = song["Cluster"] == self.user.preferredCluster
 
+        mood_alignment_bonus = max(0, 1 - mood_diff) * 2  # Bonus for mood alignment
+
+        # Base reward logic
         if mood_diff > 0.5 or (not cluster_match and random.random() < 0.5):
             skipped = random.random() < 0.8
         else:
             skipped = random.random() < 0.2
 
         if skipped:
-            if random.random() < 0.5:
-                return -1.0, "Skipped before halfway -1"
-            else:
-                return -0.5, "Skipped after halfway -0.5"
+            reward = -10 if random.random() < 0.5 else -5
+            feedback = "Skipped before halfway -10" if reward == -10 else "Skipped after halfway -5"
         else:
             emotion_roll = random.random()
-            if mood_diff < 0.2 and cluster_match:
-                if emotion_roll < 0.7:
-                    return 1.0, "Liked the song +1"
-            if mood_diff > 0.4:
-                if emotion_roll < 0.5:
-                    return -0.25, "Disliked the song -0.25"
-            if emotion_roll < 0.3:
-                return 0.1, "Neutral after full listen +0.1"
-            return 0.0, "No clear reaction 0"
+            if mood_diff < 0.2 and cluster_match and emotion_roll < 0.7:
+                reward, feedback = 10, "Liked the song +10"
+            elif mood_diff > 0.4 and emotion_roll < 0.5:
+                reward, feedback = -2.5, "Disliked the song -2.5"
+            elif emotion_roll < 0.3:
+                reward, feedback = 1.0, "Neutral after full listen +1"
+            else:
+                reward, feedback = 0.5, "No clear reaction +0.5"
+
+        reward += mood_alignment_bonus
+        return reward, feedback
+
     def getFavouriteMoodVecs(self):
         moods = []
         for title in self.user.favourite_titles:  # List of 3 song titles
