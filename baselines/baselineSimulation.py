@@ -1,7 +1,7 @@
 import pandas as pd
 from env import MusicEnv
-from randomAgent import RandomAgent
-from favClusterAgent import FavouriteClusterAgent
+from baselines.randomAgent import RandomAgent
+from baselines.favClusterAgent import FavouriteClusterAgent
 from user import User
 
 # Load song data
