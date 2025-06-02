@@ -25,7 +25,7 @@ class MusicEnv(gym.Env):
     
     def cacheFavouriteTags(self):
         self.fav_tags = set()
-        print("\n🎵 Caching Favourite Song Tags:")
+        #print("\n🎵 Caching Favourite Song Tags:")
         
         for title in self.user.favourite_titles:
             # Normalize both sides for reliable matching
@@ -36,16 +36,16 @@ class MusicEnv(gym.Env):
                 raw_terms = str(song_row.get("FilteredTerms", ""))
                 tags = [term.split(":")[0].strip().lower() for term in raw_terms.split(";") if ":" in term]
                 
-                if tags:
-                    print(f" - {title}:")
-                    for tag in tags[:10]:
-                        print(f"     • {tag}")
-                else:
-                    print(f" - {title}: (no tags found)")
-                    
-                self.fav_tags.update(tags)
-            else:
-                print(f" - {title}: ⚠️ Not found in dataset.")
+#                if tags:
+ #                   print(f" - {title}:")
+  #                  for tag in tags[:10]:
+   #                     print(f"     • {tag}")
+    #            else:
+     #               print(f" - {title}: (no tags found)")
+      #              
+       #         self.fav_tags.update(tags)
+        #    else:
+                #print(f" - {title}: ⚠️ Not found in dataset.")
 
 
     def getState(self):
