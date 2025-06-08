@@ -5,6 +5,7 @@ import numpy as np
 from env import MusicEnv
 from qLearnAgent import QLearningAgent
 from user import User
+import matplotlib.pyplot as plt
 
 # Load songs
 df = pd.read_csv("clustered_songs.csv")
@@ -36,7 +37,8 @@ mood_dict = {
 }
 
 # Pick a random user
-user_row = user_df.sample(1).iloc[0]
+# Fix user selection: use only 1 archetype consistently
+user_row = user_df.iloc[0]
 user = User(
     name=user_row["archetype"],
     startMood=user_row["startMood"],
@@ -46,6 +48,7 @@ user = User(
     favourite_titles=user_row["FavouriteSongs"].split(";") if pd.notna(user_row["FavouriteSongs"]) else []
 )
 
+
 # Initialize environment and agent
 env = MusicEnv(df, user)
 agent = QLearningAgent(n_actions=8, state_size=16)  # Assuming 8 clusters and 16-dim state
@@ -54,18 +57,9 @@ agent = QLearningAgent(n_actions=8, state_size=16)  # Assuming 8 clusters and 16
 episodes = 10000
 epsilonDecay = 0.999
 minEpsilon = 0.01
-reward_window = deque(maxlen=100)
+reward_history = []
 
 for episode in range(episodes):
-    user_row = user_df.iloc[0]
-    user = User(
-        name=user_row["archetype"],
-        startMood=user_row["startMood"],
-        endMood=user_row["endMood"],
-        preferredCluster=int(user_row["favouriteCluster"]),
-        mood_dict=mood_dict,
-        favourite_titles=user_row["FavouriteSongs"].split(";") if pd.notna(user_row["FavouriteSongs"]) else []
-    )
     env = MusicEnv(df, user)
     state = env.reset()
     total_reward = 0
@@ -78,14 +72,22 @@ for episode in range(episodes):
         total_reward += reward
         if done:
             break
-    reward_window.append(total_reward)
+    reward_history.append(total_reward)
     agent.epsilon = max(agent.epsilon * 0.995, 0.01)  # Exploration decay
-
-    if (episode + 1) % 100 == 0:
-        avg = sum(reward_window) / len(reward_window)
-        print(f"Ep {episode+1}/{episodes} | Reward: {total_reward:.2f} | Avg(100): {avg:.2f} | Eps: {agent.epsilon:.3f}")
+        
 
 pd.DataFrame({
-    "Episode": list(range(1, episodes + 1)),
-    "TotalReward": reward_window
-}).to_csv("qlearning_training_rewards.csv", index=False)
+    "Episode": list(range(1, len(reward_history) + 1)),
+    "TotalReward": reward_history
+}).to_csv("qlearning_training_rewards_10000.csv", index=False)
+
+plt.figure(figsize=(10, 6))
+plt.plot(range(len(reward_history)), reward_history, label="Total reward per episode")
+plt.title("Q-Learning Progress Over Episodes")
+plt.xlabel("Episode")
+plt.ylabel("Total Reward")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.savefig("qlearning_training_plot.png")
+plt.show()
