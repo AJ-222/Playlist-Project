@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import random
+from collections import defaultdict
 
 
 class QLearningAgent:
@@ -10,10 +11,11 @@ class QLearningAgent:
         self.alpha = alpha  # learning rate
         self.gamma = gamma  # discount factor
         self.epsilon = epsilon  # exploration rate
-        self.q_table = {}
+        self.q_table = defaultdict(lambda: np.zeros(self.n_actions))
 
     def get_state_key(self, state):
-        return tuple(np.round(state, 1))  # Discretize state
+        return tuple((state * 10).astype(int))  # ~10x faster than round + tuple
+
 
     def act(self, state):
         state_key = self.get_state_key(state)
@@ -26,7 +28,5 @@ class QLearningAgent:
     def learn(self, state, action, reward, next_state, done):
         state_key = self.get_state_key(state)
         next_state_key = self.get_state_key(next_state)
-        if next_state_key not in self.q_table:
-            self.q_table[next_state_key] = np.zeros(self.n_actions)
         target = reward if done else reward + self.gamma * np.max(self.q_table[next_state_key])
         self.q_table[state_key][action] += self.alpha * (target - self.q_table[state_key][action])
